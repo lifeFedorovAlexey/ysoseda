@@ -5,6 +5,7 @@ from bot.database import cursor, conn
 
 async def approve_registration(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admin_id = update.effective_user.id
+    first_name = update.effective_user.first_name
     
     # Проверка, что администратор
     cursor.execute("SELECT role FROM users WHERE telegram_id = ?", (admin_id,))
@@ -41,7 +42,7 @@ async def approve_registration(update: Update, context: ContextTypes.DEFAULT_TYP
             cursor.execute("SELECT * FROM users WHERE telegram_id = ?", (user_id,))
             new_user = cursor.fetchone()
             if new_user:
-                await update.message.reply_text(f"Заявка пользователя {user_id} была одобрена.")
+                await update.message.reply_text(f"Заявка пользователя {first_name} была одобрена.")
                 await context.bot.send_message(
                     chat_id=user_id,
                     text="Поздравляем, ваша заявка на регистрацию была одобрена. Вы теперь наш сосед!"

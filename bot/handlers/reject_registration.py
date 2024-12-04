@@ -5,6 +5,7 @@ from bot.database import cursor, conn
 
 async def reject_registration(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admin_id = update.effective_user.id
+    first_name = update.effective_user.first_name
     
     # Проверка, что администратор
     cursor.execute("SELECT role FROM users WHERE telegram_id = ?", (admin_id,))
@@ -34,7 +35,7 @@ async def reject_registration(update: Update, context: ContextTypes.DEFAULT_TYPE
         cursor.execute("UPDATE registration_requests SET status = ? WHERE telegram_id = ?", ('rejected', user_id))
         conn.commit()
         
-        await update.message.reply_text(f"Заявка пользователя {user_id} была отклонена.")
+        await update.message.reply_text(f"Заявка пользователя {first_name} была отклонена.")
         await context.bot.send_message(
             chat_id=user_id,
             text="К сожалению, ваша заявка на регистрацию была отклонена."
