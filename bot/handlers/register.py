@@ -70,7 +70,7 @@ async def button_register(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Уведомляем администратора
         await context.bot.send_message(
             chat_id=query.message.chat.id,
-            text=f"Заявка пользователя {user_id} была одобрена."
+            text=f"Заявка соседа {first_name} была одобрена."
         )
     elif query.data.startswith("reject"):
         cursor.execute("UPDATE registration_requests SET status = ? WHERE telegram_id = ?", ('rejected', user_id))

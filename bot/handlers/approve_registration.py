@@ -31,15 +31,26 @@ async def approve_registration(update: Update, context: ContextTypes.DEFAULT_TYP
 
     # Обработка команды
     if request[0] == 'pending':
-        # Одобряем заявку
-        cursor.execute("UPDATE registration_requests SET status = ? WHERE telegram_id = ?", ('approved', user_id))
-        cursor.execute("INSERT INTO users (telegram_id, role) VALUES (?, ?)", (user_id, 'user'))
-        conn.commit()
-        
-        await update.message.reply_text(f"Заявка пользователя {user_id} была одобрена.")
-        await context.bot.send_message(
-            chat_id=user_id,
-            text="Поздравляем, ваша заявка на регистрацию была одобрена. Вы теперь зарегистрированный пользователь!"
-        )
+        try:
+            # Одобряем заявку
+            cursor.execute("UPDATE registration_requests SET status = ? WHERE telegram_id = ?", ('approved', user_id))
+            cursor.execute("INSERT INTO users (telegram_id, role) VALUES (?, ?)", (user_id, 'user'))
+            conn.commit()
+
+            # Проверяем, что данные были добавлены
+            cursor.execute("SELECT * FROM users WHERE telegram_id = ?", (user_id,))
+            new_user = cursor.fetchone()
+            if new_user:
+                await update.message.reply_text(f"Заявка пользователя {user_id} была одобрена.")
+                await context.bot.send_message(
+                    chat_id=user_id,
+                    text="Поздравляем, ваша заявка на регистрацию была одобрена. Вы теперь наш сосед!"
+                )
+            else:
+                await update.message.reply_text("Не удалось добавить пользователя в таблицу.")
+        except Exception as e:
+            # Обрабатываем ошибку выполнения SQL
+            await update.message.reply_text(f"Произошла ошибка при обработке заявки: {e}")
+            conn.rollback()  # Откатываем изменения в случае ошибки
     else:
         await update.message.reply_text("Эта заявка уже обработана.")
