@@ -3,6 +3,8 @@ from telegram.ext import Application
 from telegram.ext import CommandHandler
 from bot.handlers.start import start
 from bot.handlers.register import register
+from bot.handlers.approve_registration import approve_registration
+from bot.handlers.reject_registration import reject_registration
 from bot.handlers.products import add_product, list_products
 from bot.handlers.orders import make_order, list_orders, process_order
 from bot.database import init_db
@@ -30,6 +32,8 @@ def main():
     application.add_handler(CommandHandler("make_order", make_order))
     application.add_handler(CommandHandler("list_orders", list_orders))
     application.add_handler(CommandHandler("process_order", process_order))
+    application.add_handler(CommandHandler("approve_registration", approve_registration))
+    application.add_handler(CommandHandler("reject_registration", reject_registration))
 
     # Логируем запуск бота
     logger.info("Бот запущен!")
